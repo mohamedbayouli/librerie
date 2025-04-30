@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AllController!{% endblock %}
+
+{% block body %}
+ <section class="hero py-5" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8 text-white"> 
+                <h1 class="display-4 fw-bold mb-3">Découvrez Votre Prochain Livre Préféré</h1>
+                <p class="lead mb-4">Parcourez notre vaste collection de livres dans tous les genres. Empruntez, lisez et explorez de nouveaux mondes.</p>
+                <div class="search-bar d-flex justify-content-center">
+                    <div class="input-group w-75">
+                        <input type="text" class="form-control" placeholder="Rechercher un livre">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search me-2"></i>Rechercher
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+  
+        <div class="container my-5">
+        
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for livre in livres %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                <div class="overflow-hidden" style="height: 300px;">
+                    <img src="{{ livre.image }}" class="card-img-top h-100 w-100 object-fit-cover" alt="Book Cover">
+                </div>
+                <div class="card-body">
+                 
+                    <h5 class="card-title">{{ livre.titre }}</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <p class="card-text text-muted">{{ livre.editeur }}</p>
+                    {% if livre.datedispo == null %}
+                        <span class="badge bg-success">Disponible</span>
+                    {% else %}
+                        <span class="badge bg-danger">Indisponible</span>
+                    {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-danger fw-bold">{{ livre.prix }} DT</span>
+                        <span class="badge bg-primary">Date d'edition:{{ livre.getDateEdition()|date('d/m/Y') }}</span>
+                    </div>
+                    
+                </div>
+                <div class="card-footer bg-white border-0 d-grid gap-2">
+                    <a class="btn btn-secondary" href={{path('app_livre_detail', {'id': livre.id})}}>Voir détail</a>
+                    <button class="btn btn-outline-primary" href={{path('app_emprunte', {'id': livre.id})}}>Emprunter</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+ 
+{% endblock %}
