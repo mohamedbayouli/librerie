@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\LivreRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -32,8 +34,7 @@ class Livre
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date_edition = null;
 
-    #[ORM\Column]
-    private ?int $prix = null;
+  
 
     #[ORM\Column(length: 255)]
     private ?string $isbn = null;
@@ -41,6 +42,23 @@ class Livre
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_dispo = null;
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    private ?int $qte = null;
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    private ?int $qtedispo = null;
+
+    /**
+     * @var Collection<int, Emprunt>
+     */
+    #[ORM\OneToMany(targetEntity: Emprunt::class, mappedBy: 'liv')]
+    private Collection $emprunts;
+
+    public function __construct()
+    {
+        $this->emprunts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -119,17 +137,7 @@ class Livre
         return $this;
     }
 
-    public function getPrix(): ?int
-    {
-        return $this->prix;
-    }
-
-    public function setPrix(int $prix): static
-    {
-        $this->prix = $prix;
-
-        return $this;
-    }
+   
 
     public function getIsbn(): ?string
     {
@@ -153,6 +161,60 @@ class Livre
     public function setDateDispo(?\DateTimeInterface $date_dispo): static
     {
         $this->date_dispo = $date_dispo;
+
+        return $this;
+    }
+
+    public function getQte(): ?int
+    {
+        return $this->qte;
+    }
+
+    public function setQte(int $qte): static
+    {
+        $this->qte = $qte;
+
+        return $this;
+    }
+
+    public function getQtedispo(): ?int
+    {
+        return $this->qtedispo;
+    }
+
+    public function setQtedispo(int $qtedispo): static
+    {
+        $this->qtedispo = $qtedispo;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Emprunt>
+     */
+    public function getEmprunts(): Collection
+    {
+        return $this->emprunts;
+    }
+
+    public function addEmprunt(Emprunt $emprunt): static
+    {
+        if (!$this->emprunts->contains($emprunt)) {
+            $this->emprunts->add($emprunt);
+            $emprunt->setLiv($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmprunt(Emprunt $emprunt): static
+    {
+        if ($this->emprunts->removeElement($emprunt)) {
+            // set the owning side to null (unless already changed)
+            if ($emprunt->getLiv() === $this) {
+                $emprunt->setLiv(null);
+            }
+        }
 
         return $this;
     }

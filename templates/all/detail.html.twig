@@ -11,10 +11,11 @@
   <img src="{{ livre.image }}" class="card-img" alt="...">
 </div>
   <div class="col">
-    <h2>{{ livre.titre }} ({{ livre.prix}} DT)</h2>
+    <h2>{{ livre.titre }}  </h2>
     <h3>Editeur: {{ livre.editeur }}</h3>
     <h3>Date Edition: {{ livre.dateEdition|date('d/m/Y') }}</h3>
     <h4>ISBN: {{ livre.isbn }}</h4>
+    <h4>quantite disponible: {{ livre.qte }}</h4>
     <p>{{ livre.resume }}</p>
 </div>
 </div>

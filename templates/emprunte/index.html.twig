@@ -3,18 +3,51 @@
 {% block title %}Hello EmprunteController!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/xampp/htdocs/projet/librerie/src/Controller/EmprunteController.php</code></li>
-        <li>Your template at <code>C:/xampp/htdocs/projet/librerie/templates/emprunte/index.html.twig</code></li>
-    </ul>
+{% if emprunt != null %}
+<div class="row" >
+<div class="col-3">
+  <img src="{{ emprunt.getLiv.image }}" class="card-img" alt="...">
 </div>
+  <div class="col">
+    <h2>{{ emprunt.getLiv.titre }}  </h2>
+    <h3>Editeur: {{ emprunt.getLiv.editeur }}</h3>
+    <h3>Date emprunt: {{ emprunt.dateemprunt }}</h3>
+    <h4>date max de retour: {{ emprunt.dateretourmax|date('d/m/Y')  }}</h4>
+    {% if emprunt.dateretourmax > 'now' %}
+    <h4 class="text-danger">date de retour depassée</h4>
+    {% endif %}
+    {% if emprunts != null %}
+    <section class="py-5 bg-light">
+    <div class="container">
+        <h1 class="display-6 fw-bold text-center text-primary mb-5">Historique des empruntes</h1>
+        <div class="table-responsive shadow rounded">
+            <table class="table table-hover table-striped align-middle bg-white">
+                <thead class="table-primary">
+                    <tr>
+                        <th scope="col">titre</th>
+                        <th scope="col">date emprunte</th>
+                        <th scope="col">date retour</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for livre in emprunts %}
+                    <tr>
+                        <td>{{ livre.getLiv.image }}</td>
+                        <td>{{ livre.dateemprunt|date('d/m/Y') }}</td>
+                        <td>{{ livre.dateretourmax|date('d/m/Y')  }}</td>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endif %}
+  </div>
+</div>
+</div>
+</div>
+
+{% endif %}
 {% endblock %}
+
+

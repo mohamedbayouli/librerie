@@ -21,7 +21,7 @@
         </div>
     </div>
 </section>
-  
+    
         <div class="container my-5">
         
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
@@ -37,16 +37,17 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                     <p class="card-text text-muted">{{ livre.editeur }}</p>
                     {% if livre.datedispo == null %}
-                        <span class="badge bg-success">Disponible</span>
+                        <span class="badge bg-success">{{ livre.qte }} Disponible </span>
                     {% else %}
-                        <span class="badge bg-danger">Indisponible</span>
+                        <span class="badge bg-danger">Indisponible jusqu'à {{livre.datedispo|date('d/m/Y')}}</span>
                     {% endif %}
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-danger fw-bold">{{ livre.prix }} DT</span>
+                   {# {% if livre.datedispo == null %}
+                        <span class="text-danger fw-bold">Quantite Disponible :{{ livre.qte }} </span>
+                        {% endif %}#}
                         <span class="badge bg-primary">Date d'edition:{{ livre.getDateEdition()|date('d/m/Y') }}</span>
                     </div>
-                    
                 </div>
                 <div class="card-footer bg-white border-0 d-grid gap-2">
                     <a class="btn btn-secondary" href={{path('app_livre_detail', {'id': livre.id})}}>Voir détail</a>
@@ -59,3 +60,9 @@
 </div>
  
 {% endblock %}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des livres{% endblock %}
+
+{% block body %}
