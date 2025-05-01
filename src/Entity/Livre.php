@@ -42,6 +42,10 @@ class Livre
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_dispo = null;
 
+    #[ORM\ManyToOne(inversedBy: 'livres')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $cat_id = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -153,6 +157,18 @@ class Livre
     public function setDateDispo(?\DateTimeInterface $date_dispo): static
     {
         $this->date_dispo = $date_dispo;
+
+        return $this;
+    }
+
+    public function getCatId(): ?Category
+    {
+        return $this->cat_id;
+    }
+
+    public function setCatId(?Category $cat_id): static
+    {
+        $this->cat_id = $cat_id;
 
         return $this;
     }
