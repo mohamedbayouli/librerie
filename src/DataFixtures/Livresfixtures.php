@@ -22,6 +22,7 @@ class Livresfixtures extends Fixture
             $livre->setResume($faker->text);
             $livre->setEditeur($faker->name()); 
             $livre->setIsbn($faker->isbn13());
+
             $livre->setDateEdition($faker->dateTimeBetween('-6 months')); 
             $manager->persist($livre);
     

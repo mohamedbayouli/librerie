@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des livres{% endblock %}
+
+{% block body %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h1 class="display-6 fw-bold text-center text-primary mb-5">Bienvenue dans l'espace "Admin"</h1>
+
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ path('app_livre_new') }}" class="btn btn-success">
+                <i class="fas fa-plus-circle me-2"></i>Ajouter un nouveau livre
+            </a>
+        </div>
+
+        <div class="table-responsive shadow rounded">
+            <table class="table table-hover table-striped align-middle bg-white">
+                <thead class="table-primary">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Titre</th>
+                        <!--<th scope="col">Slug</th>-->
+                        <th scope="col">Image</th>
+                        <th scope="col">Résumé</th>
+                        <th scope="col">Éditeur</th>
+                        <th scope="col">Date d'édition</th>
+                        <th scope="col">Quantite</th>
+                        <th scope="col">ISBN</th>
+                        <th scope="col">Disponibilité</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for livre in livres %}
+                    <tr>
+                        <td>{{ livre.id }}</td>
+                        <td>{{ livre.titre }}</td>
+                        <!--<td>{{ livre.slug }}</td>-->
+                       <td>
+                            <img src="{{ livre.image }}" alt="Image" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                        </td>
+                        <td>{{ livre.resume|length > 50 ? livre.resume[:50] ~ '...' : livre.resume }}</td>
+                        <td>{{ livre.editeur }}</td>
+                        <td>{{ livre.dateEdition ? livre.dateEdition|date('d/m/Y') : '—' }}</td>
+                        <td class="text-danger fw-semibold">{{ livre.prix }} </td>
+                        <td>{{ livre.isbn }}</td>
+                        <td>
+                            {% if livre.dateDispo is empty %}
+                                <span class="badge bg-success">Disponible</span>
+                            {% else %}
+                                <span class="badge bg-danger">Indisponible</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="{{ path('app_livre_show', {'id': livre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('app_livre_edit', {'id': livre.id}) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_livre_delete', {'id': livre.id}) }}" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ livre.id) }}">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">
+                                <i class="fas fa-trash"></i>
+                                </button>
+                                 </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center text-muted">Aucun livre trouvé.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
