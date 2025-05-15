@@ -1,0 +1,287 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Conteneur du calendrier */
+        #calendar {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        /* Style des événements */
+        .fc-event {
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .fc-event:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Style de l'en-tête */
+        .fc-toolbar-title {
+            font-size: 1.4em;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .fc-button {
+            background: #f0f0f0;
+            border: none;
+            color: #555;
+            text-transform: capitalize;
+            border-radius: 4px;
+            transition: all 0.2s;
+            padding: 6px 12px;
+        }
+        
+        .fc-button:hover {
+            background: #e0e0e0;
+        }
+        
+        .fc-button-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        /* Cellules des jours */
+        .fc-daygrid-day {
+            padding: 5px;
+        }
+        
+        /* Style de sélection */
+        .fc-highlight {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px dashed #4CAF50;
+        }
+        
+        /* Sélection invalide */
+        .fc-daygrid-body .fc-daygrid-day.fc-day-disabled {
+            background-color: rgba(255, 0, 0, 0.05);
+        }
+        
+        /* Date du jour */
+        .fc-daygrid-day.fc-day-today {
+            background-color: rgba(255, 220, 40, 0.15);
+        }
+        
+        /* En-tête du livre */
+        .book-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .availability-badge {
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    
+    if (!calendarEl) {
+        console.error('Élément calendrier non trouvé');
+        return;
+    }
+
+    const bookId = {{ livre.id }};
+    const eventSourceUrl = "{{ path('app_calendar_load', {'id': livre.id}) }}";
+    const reserveUrl = "{{ path('app_calendar_reserve') }}";
+    
+    console.log('Initialisation du calendrier pour le livre:', bookId);
+    console.log('URL source des événements:', eventSourceUrl);
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        selectable: true,
+        selectMirror: true,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek'
+        },
+        events: {
+            url: eventSourceUrl,
+            failure: function() {
+                console.error('Erreur de chargement des événements');
+                Swal.fire('Erreur', 'Impossible de charger les réservations', 'error');
+            }
+        },
+        selectAllow: function(selectInfo) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const start = new Date(selectInfo.startStr);
+            const end = new Date(selectInfo.endStr);
+            
+            // Check if selection starts before today
+            if (start < today) {
+                return false;
+            }
+            
+            // Check maximum duration (15 days)
+            const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            return diffDays <= 15;
+        },
+        select: function(info) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const start = new Date(info.startStr);
+            const end = new Date(info.endStr);
+            const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            
+            if (start < today) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Date invalide', 
+                    text: 'Vous ne pouvez pas réserver pour une date passée',
+                    confirmButtonText: 'OK'
+                });
+                calendar.unselect();
+                return;
+            }
+            
+            if (diffDays > 15) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Durée invalide',
+                    text: 'La période maximale de réservation est de 15 jours',
+                    footer: `Vous avez sélectionné ${diffDays} jours`
+                });
+                calendar.unselect();
+                return;
+            }
+
+            Swal.fire({
+                title: 'Confirmer la réservation',
+                html: `
+                    <div style="text-align: left; margin-bottom: 15px;">
+                        <p><i class="fas fa-calendar-alt"></i> <b>${diffDays} jour${diffDays > 1 ? 's' : ''}</b> de réservation</p>
+                        <p><i class="fas fa-book"></i> {{ livre.titre|e('js') }}</p>
+                        <p><i class="fas fa-user"></i> {{ app.user.nom|e('js') }}</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                        <p><i class="fas fa-arrow-right"></i> <b>Du :</b> ${info.startStr}</p>
+                        <p><i class="fas fa-arrow-left"></i> <b>Au :</b> ${info.endStr}</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmer',
+                cancelButtonText: 'Annuler',
+                confirmButtonColor: '#4CAF50',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(reserveUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            livre_id: bookId,
+                            start: info.startStr,
+                            end: info.endStr
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            calendar.addEvent({
+                                title: 'Votre Réservation',
+                                start: info.startStr,
+                                end: info.endStr,
+                                backgroundColor: '#4CAF50',
+                                borderColor: '#4CAF50'
+                            });
+                            Swal.fire({
+                                title: 'Réservation confirmée !',
+                                html: `
+                                    <div style="text-align: center;">
+                                        <i class="fas fa-check-circle" style="font-size: 50px; color: #4CAF50;"></i>
+                                        <p style="margin-top: 15px;">Votre réservation pour <b>${diffDays} jour${diffDays > 1 ? 's' : ''}</b> a été confirmée</p>
+                                    </div>
+                                `,
+                                confirmButtonText: 'OK'
+                            });
+                            calendar.refetchEvents();
+                        } else {
+                            Swal.fire('Erreur', data.message || 'Échec de la réservation', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        Swal.fire('Erreur', 'Échec de la réservation. Veuillez réessayer.', 'error');
+                    });
+                }
+            });
+        },
+        eventClick: function(info) {
+            const start = info.event.start ? info.event.start.toLocaleDateString() : 'Non défini';
+            const end = info.event.end ? info.event.end.toLocaleDateString() : 'Non défini';
+            
+            Swal.fire({
+                title: 'Détails de la réservation',
+                html: `
+                    <div style="text-align: left;">
+                        <p><i class="fas fa-book"></i> <b>Livre :</b> {{ livre.titre|e('js') }}</p>
+                        <p><i class="fas fa-user"></i> <b>Réservé par :</b> ${info.event.extendedProps?.user || 'Vous'}</p>
+                        <hr>
+                        <p><i class="fas fa-calendar-check"></i> <b>Début :</b> ${start}</p>
+                        <p><i class="fas fa-calendar-times"></i> <b>Fin :</b> ${end}</p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Fermer'
+            });
+        }
+    });
+    
+    calendar.render();
+});
+</script>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="book-header">
+            <h2>{{ livre.titre }}</h2>
+            <div class="mt-2">
+                <span class="availability-badge bg-{{ livre.qteDispo > 0 ? 'success' : 'danger' }}">
+                    <i class="fas fa-{{ livre.qteDispo > 0 ? 'check' : 'times' }}"></i>
+                    {{ livre.qteDispo }} exemplaire{{ livre.qteDispo != 1 ? 's' : '' }} disponible{{ livre.qteDispo != 1 ? 's' : '' }}
+                </span>
+                {% if livre.dateDispo %}
+                    <span class="availability-badge bg-warning text-dark ms-2">
+                        <i class="fas fa-clock"></i>
+                        Disponible le {{ livre.dateDispo|date('d/m') }}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        <div id="calendar"></div>
+    </div>
+{% endblock %}
