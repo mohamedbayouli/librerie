@@ -40,24 +40,24 @@ class LivreRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    public function findByFilters(?string $searchTerm = null, ?int $categoryId = null): array
+    public function findByFilters(?string $searchTerm = null, ?int $categoryId = null, ?int $subCategoryId = null): array
     {
         $qb = $this->createQueryBuilder('l');
         
         // Filtre par terme de recherche (titre)
         if ($searchTerm) {
-            $qb->andWhere('l.titre LIKE :searchTerm')
+            $qb->andWhere('l.titre LIKE :searchTerm OR l.tags LIKE :searchTerm')
             ->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
         
-        // Filtre par catégorie
-        if ($categoryId) {
+        if ($subCategoryId !== null) {
+            $qb->andWhere('l.subCategory = :subCategoryId')
+               ->setParameter('subCategoryId', $subCategoryId);
+        } elseif ($categoryId !== null) {
             $qb->andWhere('l.cat_id = :categoryId')
                ->setParameter('categoryId', $categoryId);
         }
         
-        // Tri par titre par défaut
-        $qb->orderBy('l.titre', 'ASC');
         
         return $qb->getQuery()->getResult();
     }

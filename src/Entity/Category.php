@@ -24,8 +24,12 @@ class Category
     #[ORM\OneToMany(targetEntity: Livre::class, mappedBy: 'cat_id')]
     private Collection $livres;
 
+    #[ORM\OneToMany(targetEntity: SubCategory::class, mappedBy: 'category', cascade: ['persist'])]
+    private Collection $subCategories;
+
     public function __construct()
     {
+        $this->subCategories = new ArrayCollection();
         $this->livres = new ArrayCollection();
     }
 
@@ -70,6 +74,33 @@ class Category
             // set the owning side to null (unless already changed)
             if ($livre->getCatId() === $this) {
                 $livre->setCatId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSubCategories(): Collection
+    {
+        return $this->subCategories;
+    }
+
+    public function addSubCategory(SubCategory $subCategory): static
+    {
+        if (!$this->subCategories->contains($subCategory)) {
+            $this->subCategories->add($subCategory);
+            $subCategory->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubCategory(SubCategory $subCategory): static
+    {
+        if ($this->subCategories->removeElement($subCategory)) {
+            // set the owning side to null (unless already changed)
+            if ($subCategory->getCategory() === $this) {
+                $subCategory->setCategory(null);
             }
         }
 

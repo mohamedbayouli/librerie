@@ -42,9 +42,14 @@ class Livre
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_dispo = null;
 
-    #[ORM\ManyToOne(inversedBy: 'livres')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'livres')]
     private ?Category $cat_id = null;
+
+    #[ORM\ManyToOne(targetEntity: SubCategory::class, inversedBy: 'livres')]
+    private ?SubCategory $subCategory = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $tags = null;
 
     public function getId(): ?int
     {
@@ -172,4 +177,16 @@ class Livre
 
         return $this;
     }
+
+    public function getTags(): ?string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(?string $tags): self
+    {
+        $this->tags = $tags;
+        return $this;
+    }
+    
 }
