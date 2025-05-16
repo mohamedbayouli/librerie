@@ -2,79 +2,65 @@
 
 namespace App\Controller;
 
-use App\Entity\Emprunt;
-use App\Entity\Livre;
 use App\Entity\User;
-use Doctrine\ORM\EntityManager;
+use App\Entity\Livre;
+use App\Entity\Emprunt;
+use App\Repository\EmpruntRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class EmprunteController extends AbstractController
 {
-    #[Route('/user/emprunte', name: 'app_emprunte')]
-    public function emprunte(Livre $livre,EntityManager $em): Response
-    {
-        if($livre->getDateDispo() != null){
-            $this->addFlash(
-                'danger', 
-                'livre sera disponible '.$livre->getDateDispo()->format('d/m/Y')
-            );
-            return $this->redirect('emprunte/index.html.twig');
-        }
-        // waiting registration
-       /* else if($this->getUser() ==null){
+    #[Route('/calendar/reserve', name: 'app_calendar_reserve', methods: ['POST'])]
+public function reserveBook(Request $request, EntityManagerInterface $em,EmpruntRepository $rep): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    $livre = $em->getRepository(Livre::class)->find($data['livre_id']);
+    $user = $this->getUser();
 
 
-            return $this->render('register/login.html.twig');
-        }
-        else if($this->getUser()->getLivId() != null){
-            $this->addFlash(
-                'danger', 
-                'vous avez deja un livre emprunté'
-            );
-            return $this->redirect('emprunte/index.html.twig');
-        }*/
-        else if($livre->getQteDispo() == 0){
-            $this->addFlash(
-                'danger', 
-                'livre non disponible'  
-            );
-            return $this->redirect('emprunte/index.html.twig');
-        }
-        else{  
-            $livre->setQteDispo($livre->getQteDispo()-1);
-            if($livre->getQteDispo() == 0){
-                $livre->setDateDispo(new \DateTime('+15 days'));
-                
-            }
-            $emprunt=new Emprunt();
-            $emprunt->setLiv($livre);
-            $emprunt->setUser($this->getUser());
-            $emprunt->setDateEmprunt(new \DateTime());
-            $emprunt->setDateRetourMax(new \DateTime('+15 days'));
-            $emprunt->setDateRetour(null);
-            $em->persist($emprunt);
-            $em->flush();
-            $em->persist($livre);
-            $em->flush();
-             return $this->render('emprunte/index.html.twig', [
-            'controller_name' => 'EmprunteController',
-        ]);
-        }
-        return $this->render('emprunte/index.html.twig', [
-            'controller_name' => 'EmprunteController',
-        ]);
+    if ($livre->getQteDispo() <= 0) {
+        return new JsonResponse(['success' => false, 'message' => 'Aucune copie disponible'], 400);
     }
+    $limit = $rep->findBy(['user' => $user, 'retour' => false]);
+    if (count($limit) >= 1) {
+        return new JsonResponse(['success' => false, 'message' => 'Vous ne pouvez réserver qu\'un seul livre à la fois'], 400);
+    }
+  
+    $emprunt = new Emprunt();
+    $emprunt->setLiv($livre);
+    $emprunt->setUser($user);
+    $emprunt->setDateEmprunt(new \DateTime($data['start']));
+    $emprunt->setDateRetourMax(new \DateTime($data['end']));
+    $emprunt->setRetour(false);
+    $livre->setQteDispo($livre->getQteDispo() - 1);
+    $em->persist($emprunt);
+    $em->flush();
+
+    return new JsonResponse([
+        'success' => true,
+        'event' => [
+            'id' => $emprunt->getId(),
+            'title' => 'Your Reservation',
+            'start' => $data['start'],
+            'end' => $data['end'],
+            'color' => '#4CAF50'
+        ]
+    ]);
+}
     #[Route('/user/emprunts', name: 'app_emprunte_all')]
     public function emprunts(EntityManagerInterface $em): Response
-    {
+    { 
+        
         $user = $this->getUser();
-       /* if($user == null){
-            return $this->render('register/login.html.twig');
+       if($user == null){
+            return $this->render('security/login.html.twig');
         }
-        else*/{
+        else{
             $emprunts = $em->getRepository(Emprunt::class)->findBy(['user' => $user , 'retour' => true]);
             $emprunt = $em->getRepository(Emprunt::class)->findOneBy(['user' => $user , 'retour' => false]);
 
@@ -84,24 +70,78 @@ final class EmprunteController extends AbstractController
             ]);
         }
     }
-    #[Route('/user/emprunt/retour', name: 'app_emprunt_retour')]
-    public function retour(EntityManagerInterface $em): Response
+    #[Route('/admin/emprunt/retour/{id}', name: 'app_emprunte_retour')]
+    public function retour(EntityManagerInterface $em,Emprunt $emprunte): Response
     {
-        $user = $this->getUser();
-        
-        
-            $emprunt = $em->getRepository(Emprunt::class)->findOneBy(['user' => $user , 'retour' => false]);
-            
-                $livre = $emprunt->getLiv();
+                $livre = $emprunte->getLiv();
                 $livre->setQteDispo($livre->getQteDispo()+1); 
                 $livre->setDateDispo(null);
-                $emprunt->setDateRetour(new \DateTime());
-                $emprunt->setRetour(true);
+                $emprunte->setDateRetour(new \DateTime());
+                $emprunte->setRetour(true);
                 $em->persist($livre);
-                $em->persist($emprunt);
+                $em->persist($emprunte);
             
             $em->flush();
-            return $this->redirect('index.html.twig');
+            return $this->redirectToRoute('app_emprunt');
         
     }
+    #[Route('/admin/emprunt', name: 'app_emprunt')]
+    public function emprunt(EmpruntRepository $rep): Response
+    {
+       
+        return $this->render('emprunte/admin.html.twig', [
+            
+            'emprunts' => $rep->findAll()
+        ]);
+    }
+#[Route('/calendar/{id}', name: 'app_calendar')]
+    public function index(Livre $livre): Response
+    {
+        return $this->render('emprunte/calendar.html.twig',[
+            'livre' => $livre,
+        ]); 
+    }
+   #[Route('/calendar/load/{id}', name: 'app_calendar_load')]
+public function loadEvents(EmpruntRepository $repository, $id): JsonResponse
+{
+    $reservations = $repository->findBy([
+        'liv' => $id, 
+        'retour' => false
+    ]);
+    
+    $events = [];
+    foreach ($reservations as $reservation) {
+        $events[] = [
+            'id' => $reservation->getId(),
+            'title' => "Réservé par " . $reservation->getUser()->getNom(), // More informative
+            'start' => $reservation->getDateEmprunt()->format('Y-m-d'),
+            'end' => $reservation->getDateRetourMax()->modify('+1 day')->format('Y-m-d'), // +1 day to include end date
+            'color' => '#4CAF50', // Nicer green
+            'textColor' => '#ffffff',
+            'borderColor' => '#388E3C',
+            'extendedProps' => [
+                'user' => $reservation->getUser()->getNom(),
+                'book' => $reservation->getLiv()->getTitre(),
+                'period' => $reservation->getDateEmprunt()->format('M d') . ' - ' . 
+                            $reservation->getDateRetourMax()->format('M d')
+            ]
+        ];
+        
+    }
+
+    return new JsonResponse($events);
+}
+    #[Route('/user/emprunt/delete/{id}', name: 'app_reserve_annuler')]
+public function deleteEvent(Emprunt $emprunt, EntityManagerInterface $em)
+{
+    $livre = $emprunt->getLiv();
+    $livre->setQteDispo($livre->getQteDispo() + 1);
+    $livre->setDateDispo(null);
+    $em->persist($livre);
+    $em->remove($emprunt);
+    $em->flush();
+
+    return $this->redirectToRoute('app_all');
+}
+
 }

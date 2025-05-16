@@ -22,7 +22,7 @@ final class LivreController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_livre_new', methods: ['GET', 'POST'])]
+    #[Route('/admin/new', name: 'app_livre_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $livre = new Livre();
@@ -50,7 +50,7 @@ final class LivreController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_livre_edit', methods: ['GET', 'POST'])]
+    #[Route('/admin/{id}/edit', name: 'app_livre_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Livre $livre, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(LivreType::class, $livre);
@@ -68,7 +68,7 @@ final class LivreController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_livre_delete', methods: ['POST'])]
+    #[Route('/admin/{id}', name: 'app_livre_delete', methods: ['POST'])]
     public function delete(Request $request, Livre $livre, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$livre->getId(), $request->getPayload()->getString('_token'))) {

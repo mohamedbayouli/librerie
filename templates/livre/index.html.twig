@@ -42,7 +42,7 @@
                         <td>{{ livre.resume|length > 50 ? livre.resume[:50] ~ '...' : livre.resume }}</td>
                         <td>{{ livre.editeur }}</td>
                         <td>{{ livre.dateEdition ? livre.dateEdition|date('d/m/Y') : '—' }}</td>
-                        <td class="text-danger fw-semibold">{{ livre.prix }} </td>
+                        <td class="text-danger fw-semibold">{{ livre.qte }} </td>
                         <td>{{ livre.isbn }}</td>
                         <td>
                             {% if livre.dateDispo is empty %}

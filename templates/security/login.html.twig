@@ -28,7 +28,7 @@
         <div class="card-body">
             <h2 class="card-title text-center mb-4">Welcome Back</h2>
 
-            {% if error %}
+            {% if error is defined and error %}
                 <div class="alert alert-danger">
                     {{ error.messageKey|trans(error.messageData, 'security') }}
                 </div>
@@ -44,7 +44,7 @@
             <form method="post">
                 <div class="mb-3">
                     <label for="inputEmail" class="form-label">Email</label>
-                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                    <input type="email" value="{% if last_username is defined %}{{ last_username }}{% endif %}"  name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
                 </div>
 
                 <div class="mb-3">

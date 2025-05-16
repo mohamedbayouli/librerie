@@ -18,6 +18,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    /**
+     * Removes sensitive data from the user.
+     *
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -26,8 +36,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $nom = null; // ✅ champ nom ajouté
 
     #[ORM\Column(length: 255)]
     private ?string $numCarte = null; // ✅ champ numCarte ajouté
@@ -53,6 +61,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Emprunt::class, mappedBy: 'user')]
     private Collection $emprunts;
 
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
+
     public function __construct()
     {
         $this->emprunts = new ArrayCollection();
@@ -75,17 +86,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNom(): ?string
-    {
-        return $this->nom;
-    }
-
-    public function setNom(string $nom): static
-    {
-        $this->nom = $nom;
-
-        return $this;
-    }
+   
+    
 
     public function getNumCarte(): ?string
     {
@@ -192,9 +194,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials(): void
-    {
-        // $this->plainPassword = null;
-
-    }
+   
 }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }}
