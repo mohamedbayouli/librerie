@@ -10,18 +10,52 @@
                 <h1 class="display-4 fw-bold mb-3">Découvrez Votre Prochain Livre Préféré</h1>
                 <p class="lead mb-4">Parcourez notre vaste collection de livres dans tous les genres. Empruntez, lisez et explorez de nouveaux mondes.</p>
                 <div class="search-bar d-flex justify-content-center">
-                    <div class="input-group w-75">
-                        <input type="text" class="form-control" placeholder="Rechercher un livre">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search me-2"></i>Rechercher
-                        </button>
-                    </div>
+                    <form method="get" action="{{ path('app_all') }}" class="w-75">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                placeholder="Rechercher un livre"
+                                name="search"
+                                value="{{ app.request.query.get('search') }}"
+                            >
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search me-2"></i>Rechercher
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </section>
+<<<<<<< HEAD
+<div class="container my-4">
+    <form method="get" action="{{ path('app_all') }}">
+        <div class="row">
+            <div class="col-mf-8">
+                <select name="category_filter" class="form-select" onchange="this.form.submit()">
+                    <option value="{{ 0 }}">Toutes les catégories</option>
+                        {% if categories is not empty %}
+                            {% for category in categories %}
+                                <option value="category_{{ category.id }}" {{ app.request.query.get('category_filter') == 'category_' ~ category.id ? 'selected' }}>
+                                    {{ category.name }}
+                                </option>
+                                {% for subCategory in category.subCategories %}
+                                    <option value="subcategory_{{ subCategory.id }}" {{ app.request.query.get('category_filter') == 'subcategory_' ~ subCategory.id ? 'selected' }}>
+                                        {{ category.name }} - {{ subCategory.name }}
+                                    </option>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                </select>
+            </div>
+    </form>
+</div>
+  
+=======
     
+>>>>>>> 8536f40aa3559f208276e8c05f2cc746b51786b6
         <div class="container my-5">
         
 {% for type, messages in app.flashes %}

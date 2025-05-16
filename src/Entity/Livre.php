@@ -43,6 +43,14 @@ class Livre
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_dispo = null;
 
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'livres')]
+    private ?Category $cat_id = null;
+
+    #[ORM\ManyToOne(targetEntity: SubCategory::class, inversedBy: 'livres')]
+    private ?SubCategory $subCategory = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $tags = null;
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $qte = null;
 
@@ -165,6 +173,14 @@ class Livre
         return $this;
     }
 
+    public function getCatId(): ?Category
+    {
+        return $this->cat_id;
+    }
+
+    public function setCatId(?Category $cat_id): static
+    {
+        $this->cat_id = $cat_id;
     public function getQte(): ?int
     {
         return $this->qte;
@@ -177,6 +193,17 @@ class Livre
         return $this;
     }
 
+    public function getTags(): ?string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(?string $tags): self
+    {
+        $this->tags = $tags;
+        return $this;
+    }
+    
     public function getQtedispo(): ?int
     {
         return $this->qtedispo;
