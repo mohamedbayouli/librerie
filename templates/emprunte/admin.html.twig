@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Emprunts{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+   
+    
+    {% if emprunts != null %}
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0"><i class="fas fa-history me-2"></i>Les emprunts</h2>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Titre</th>
+                            <th scope="col">Date emprunt</th>
+                            <th scope="col">Date retour</th>
+                            <th scope="col">Date retour max</th>
+                            <th scope="col">action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for livre in emprunts %}
+                        <tr>
+                            <td>{{ livre.getLiv.titre }}</td>
+                            <td>{{ livre.dateemprunt|date('d/m/Y') }}</td>
+                            <td>{{ livre.dateretour ? livre.dateretour|date('d/m/Y') : '-' }}</td>
+                            <td>{{ livre.dateretourmax|date('d/m/Y') }}</td>
+                            <td>
+                                {% if livre.dateretour == null %}
+                                <a class="btn btn-primary px-4" href="{{ path('app_emprunte_retour',{'id':livre.id}) }}">
+                                    <i class="fas fa-book-return me-2"></i>Retourner
+                                </a>
+                                {% else %}
+                                <span class="badge bg-success">Rendu</span>
+                                {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

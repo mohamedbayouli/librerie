@@ -29,6 +29,7 @@
         </div>
     </div>
 </section>
+<<<<<<< HEAD
 <div class="container my-4">
     <form method="get" action="{{ path('app_all') }}">
         <div class="row">
@@ -52,8 +53,38 @@
     </form>
 </div>
   
+=======
+    
+>>>>>>> 8536f40aa3559f208276e8c05f2cc746b51786b6
         <div class="container my-5">
         
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ type }} alert-dismissible fade show auto-dismiss" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const alerts = document.querySelectorAll('.alert.auto-dismiss');
+        alerts.forEach(function (alert) {
+            setTimeout(function () {
+                alert.classList.remove('show'); // triggers fade out
+                alert.classList.add('fade');    // ensure fade class is applied
+            }, 3000); // wait 3 seconds before starting fade
+
+            setTimeout(function () {
+                alert.remove(); // remove from DOM after fade completes
+            }, 3500); // 500ms after fade starts (Bootstrap default transition duration is ~300ms)
+        });
+    });
+</script>
+
+
+    
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
         {% for livre in livres %}
         <div class="col">
@@ -62,25 +93,25 @@
                     <img src="{{ livre.image }}" class="card-img-top h-100 w-100 object-fit-cover" alt="Book Cover">
                 </div>
                 <div class="card-body">
-                 
                     <h5 class="card-title">{{ livre.titre }}</h5>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                     <p class="card-text text-muted">{{ livre.editeur }}</p>
                     {% if livre.datedispo == null %}
-                        <span class="badge bg-success">Disponible</span>
+                        <span class="badge bg-success">{{ livre.qtedispo }} Disponible </span>
                     {% else %}
-                        <span class="badge bg-danger">Indisponible</span>
+                        <span class="badge bg-danger">Indisponible jusqu'à {{livre.datedispo|date('d/m/Y')}}</span>
                     {% endif %}
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-danger fw-bold"></span>
+                   {# {% if livre.datedispo == null %}
+                        <span class="text-danger fw-bold">Quantite Disponible :{{ livre.qte }} </span>
+                        {% endif %}#}
                         <span class="badge bg-primary">Date d'edition:{{ livre.getDateEdition()|date('d/m/Y') }}</span>
                     </div>
-                    
                 </div>
                 <div class="card-footer bg-white border-0 d-grid gap-2">
                     <a class="btn btn-secondary" href={{path('app_livre_detail', {'id': livre.id})}}>Voir détail</a>
-                    <button class="btn btn-outline-primary" href={{path('app_emprunte', {'id': livre.id})}}>Emprunter</button>
+                    <a class="btn btn-outline-primary" href={{path('app_calendar', {'id': livre.id})}}>Emprunter</a>
                 </div>
             </div>
         </div>
@@ -89,3 +120,4 @@
 </div>
  
 {% endblock %}
+
