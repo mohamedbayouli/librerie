@@ -14,7 +14,7 @@ class Etudiant
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $numCarte = null;
+    private ?string $num_carte = null;
 
     public function getId(): ?int
     {
@@ -23,12 +23,12 @@ class Etudiant
 
     public function getNumCarte(): ?string
     {
-        return $this->numCarte;
+        return $this->num_carte;
     }
 
-    public function setNumCarte(string $numCarte): static
+    public function setNumCarte(string $num_carte): static
     {
-        $this->numCarte = $numCarte;
+        $this->num_carte = $num_carte;
 
         return $this;
     }

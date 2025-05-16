@@ -35,7 +35,7 @@ class LivreType extends AbstractType
                 'widget' => 'single_text',
                 'label' => 'Date d\'édition'
             ])
-            ->add('prix', NumberType::class, [
+            ->add('qte', NumberType::class, [
                 'label' => 'Quantite'
             ])
             ->add('isbn', TextType::class, [

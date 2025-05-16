@@ -30,7 +30,7 @@ class RegistrationFormType extends AbstractType
                         'message' => 'Veuillez entrer votre numéro de carte étudiant.',
                     ]),
                     new Callback(function ($numCarte, ExecutionContextInterface $context) use ($etudiantRepository) {
-                        $etudiant = $etudiantRepository->findOneBy(['numCarte' => $numCarte]);
+                        $etudiant = $etudiantRepository->findOneBy(['num_carte' => $numCarte]);
 
                         if (!$etudiant) {
                             $context->buildViolation('Le numéro de carte étudiant est invalide.')
