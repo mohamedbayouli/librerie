@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Category;
+use App\Entity\SubCategory;
 
 class LivreType extends AbstractType
 {
@@ -46,6 +49,21 @@ class LivreType extends AbstractType
                 'required' => false,
                 'label' => 'Date d\'indisponibilité (facultative)'
             ])
+<<<<<<< HEAD
+=======
+             ->add('cat_id', EntityType::class, [
+            'class' => Category::class,
+            'choice_label' => 'name', // Remplace 'nom' par l'attribut réel de ta catégorie (par ex. 'titre' ou autre)
+            'placeholder' => 'Sélectionnez une catégorie',
+            'label' => 'Catégorie',
+        ])
+         ->add('subCategory', EntityType::class, [
+                'class' => SubCategory::class,
+                'choice_label' => 'name',
+                'label' => 'Sous-catégorie',
+                'required' => false,
+            ])
+>>>>>>> 1179a0f (the finale version)
         ;
     }
 

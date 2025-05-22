@@ -55,7 +55,7 @@ class Livre
     private ?int $qte = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $qtedispo = null;
+    private ?int $qtedispo = 0;
 
     /**
      * @var Collection<int, Emprunt>
@@ -181,8 +181,23 @@ class Livre
     public function setCatId(?Category $cat_id): static
     {
         $this->cat_id = $cat_id;
+        return $this;
+    }
+    public function getSubCategory(): ?SubCategory
+{
+    return $this->subCategory;
+}
+
+public function setSubCategory(?SubCategory $subCategory): static
+{
+    $this->subCategory = $subCategory;
+
+    return $this;
+}
+
     public function getQte(): ?int
     {
+
         return $this->qte;
     }
 

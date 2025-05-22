@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Catégorie{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://img.freepik.com/photos-gratuite/vue-dessus-livres-espace-copie_23-2148827187.jpg?ga=GA1.1.658740073.1733163417&semt=ais_hybrid&w=740');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #004d40;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .card-custom {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        padding: 30px;
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+    table {
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    th {
+        width: 30%;
+        color: #00796b;
+        font-weight: 600;
+    }
+    td {
+        font-weight: 500;
+        color: #333;
+    }
+    .btn-custom {
+        border-radius: 30px;
+        font-weight: 500;
+        padding: 8px 18px;
+        margin-right: 10px;
+        cursor: pointer;
+        border: none;
+        transition: filter 0.3s ease;
+    }
+    .btn-secondary {
+        background: #eeeeee;
+        color: #333;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, #29b6f6, #0288d1);
+        color: white;
+    }
+    .btn-danger {
+        background: linear-gradient(45deg, #e57373, #d32f2f);
+        color: white;
+        box-shadow: 0 5px 15px rgba(229, 115, 115, 0.4);
+    }
+    .btn-danger:hover {
+        filter: brightness(1.1);
+    }
+    form {
+        display: inline-block;
+    }
+</style>
+
+<div class="container">
+    <div class="card card-custom">
+        <h1>Détails de la Catégorie</h1>
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td>{{ category.id }}</td>
+                </tr>
+                <tr>
+                    <th>Nom</th>
+                    <td>{{ category.name }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="text-center mt-4">
+            <a href="{{ path('app_category_index') }}" class="btn btn-secondary btn-custom">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+            <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="btn btn-primary btn-custom">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+             {{ include('category/_delete_form.html.twig', {'category': category}) }}
+         
+        </div>
+    </div>
+</div>
+{% endblock %}
