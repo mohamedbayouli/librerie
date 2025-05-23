@@ -13,11 +13,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\CategoryRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 
 final class AllController extends AbstractController
 {
     #[Route('/all', name: 'app_all')]
-    public function showall(Request $request, LivreRepository $rep, CategoryRepository $categoryRepository): Response
+    public function showall(Request $request, LivreRepository $rep, CategoryRepository $categoryRepository, PaginatorInterface $paginator): Response
     {
         $searchTerm = $request->query->get('search');
         $categoryFilter = $request->query->get('category_filter');

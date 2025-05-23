@@ -3,78 +3,121 @@
 {% block title %}Détail du livre{% endblock %}
 
 {% block body %}
-<section class="py-5 bg-light">
+<style>
+    body {
+        background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .overlay-details {
+        background: rgba(255, 255, 255, 0.97);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th {
+        width: 30%;
+        color: #2e7d32;
+    }
+
+    .img-fluid {
+        border-radius: 8px;
+        max-height: 200px;
+    }
+
+    .card-header.bg-info {
+        background: linear-gradient(45deg, #29b6f6, #0288d1);
+    }
+</style>
+
+<section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-info text-white text-center">
-                        <h2 class="mb-0">Détail du livre</h2>
+            <div class="col-lg-10">
+                <div class="overlay-details">
+                    <div class="text-center mb-4">
+                        <h2 class="text-info fw-bold">📖 Détail du livre</h2>
+                        <p class="text-muted fst-italic">Consultez toutes les informations de l’ouvrage</p>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr>
-                                    <th scope="row">ID</th>
-                                    <td>{{ livre.id }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Titre</th>
-                                    <td>{{ livre.titre }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Slug</th>
-                                    <td>{{ livre.slug }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Image</th>
-                                    <td>
-                                        {% if livre.image %}
-                                            <img src="{{ livre.image }}" alt="Couverture" class="img-fluid" style="max-height: 200px;">
-                                        {% else %}
-                                            <em>Aucune image</em>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Résumé</th>
-                                    <td>{{ livre.resume }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Éditeur</th>
-                                    <td>{{ livre.editeur }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Date d'édition</th>
-                                    <td>{{ livre.dateEdition ? livre.dateEdition|date('Y-m-d') : 'Non renseignée' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Quantite</th>
-                                    <td>{{ livre.qte }} </td>
-                                </tr>
-                                <tr>
-                                    <th>ISBN</th>
-                                    <td>{{ livre.isbn }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Date d’indisponibilité</th>
-                                    <td>{{ livre.dateDispo ? livre.dateDispo|date('Y-m-d') : 'Toujours disponible' }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{{ path('app_livre_index') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                    <table class="table table-bordered bg-white">
+                        <tbody>
+                            <tr>
+                                <th>ID</th>
+                                <td>{{ livre.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Titre</th>
+                                <td>{{ livre.titre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Slug</th>
+                                <td>{{ livre.slug }}</td>
+                            </tr>
+                            <tr>
+                                <th>Image</th>
+                                <td>
+                                    {% if livre.image %}
+                                        <img src="{{ livre.image }}" alt="Couverture" class="img-fluid">
+                                    {% else %}
+                                        <span class="text-muted">Aucune image disponible</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Résumé</th>
+                                <td>{{ livre.resume }}</td>
+                            </tr>
+                            <tr>
+                                <th>Éditeur</th>
+                                <td>{{ livre.editeur }}</td>
+                            </tr>
+                            <tr>
+                                <th>Date d'édition</th>
+                                <td>{{ livre.dateEdition ? livre.dateEdition|date('Y-m-d') : 'Non renseignée' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Quantité</th>
+                                <td>{{ livre.qte }}</td>
+                            </tr>
+                            <tr>
+                                <th>ISBN</th>
+                                <td>{{ livre.isbn }}</td>
+                            </tr>
+                            <tr>
+                                <th>Disponibilité</th>
+                                <td>
+                                    {% if livre.dateDispo %}
+                                        <span class="badge bg-danger">Indisponible depuis {{ livre.dateDispo|date('Y-m-d') }}</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Disponible</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Catégorie</th>
+                                <td>{{ livre.catId ? livre.catId.name : '—' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Sous-catégorie</th>
+                                <td>{{ livre.subCategory ? livre.subCategory.name : '—' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('app_livre_index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                        <div>
+                            <a href="{{ path('app_livre_edit', {'id': livre.id}) }}" class="btn btn-primary me-2">
+                                <i class="fas fa-edit me-1"></i> Modifier
                             </a>
-                            <div>
-                                <a href="{{ path('app_livre_edit', {'id': livre.id}) }}" class="btn btn-primary me-2">
-                                    <i class="fas fa-edit me-1"></i> Modifier
-                                </a>
-                                {{ include('livre/_delete_form.html.twig') }}
-                            </div>
+                            {{ include('livre/_delete_form.html.twig') }}
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
