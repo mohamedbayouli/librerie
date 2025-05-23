@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Catégories{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://img.freepik.com/photos-gratuite/vue-dessus-livres-espace-copie_23-2148827187.jpg?ga=GA1.1.658740073.1733163417&semt=ais_hybrid&w=740');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #004d40;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .card-custom {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        padding: 30px;
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+    thead tr {
+        background: linear-gradient(45deg, #00796b, #004d40);
+        color: white;
+        text-align: left;
+        border-radius: 15px;
+    }
+    thead th {
+        padding: 12px 15px;
+    }
+    tbody tr {
+        background: #f9f9f9;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        border-radius: 12px;
+    }
+    tbody td {
+        padding: 12px 15px;
+        vertical-align: middle;
+    }
+    a.btn-custom {
+        border-radius: 30px;
+        font-weight: 500;
+        padding: 6px 15px;
+        margin-right: 10px;
+        text-decoration: none;
+        color: white;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+    a.btn-show {
+        background: linear-gradient(45deg, #29b6f6, #0288d1);
+    }
+    a.btn-edit {
+        background: linear-gradient(45deg, #ffb74d, #f57c00);
+    }
+    a.btn-delete {
+        background: linear-gradient(45deg, #e57373, #d32f2f);
+    }
+    a.btn-create {
+        display: inline-block;
+        margin-top: 20px;
+        background: linear-gradient(45deg, #4caf50, #388e3c);
+        color: white;
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 5px 15px rgba(72,187,120,0.4);
+        transition: background-color 0.3s ease;
+    }
+    a.btn-create:hover,
+    a.btn-show:hover,
+    a.btn-edit:hover,
+    a.btn-delete:hover {
+        filter: brightness(1.1);
+    }
+</style>
+
+<div class="container">
+    <div class="card card-custom">
+        <h1>📚 Gestion des Catégories</h1>
+
+        {% if categories|length > 0 %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td class="fw-bold text-primary">{{ category.id }}</td>
+                            <td>{{ category.name }}</td>
+                            <td>
+                                <a href="{{ path('app_category_show', {'id': category.id}) }}" class="btn-custom btn-show">Voir</a>
+                                <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="btn-custom btn-edit">Modifier</a>
+                                {{ include('category/_delete_form.html.twig', {'category': category}) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-warning text-center">
+                😕 Aucune catégorie trouvée.<br> Cliquez sur "Créer une catégorie" pour commencer.
+            </div>
+        {% endif %}
+
+        <a href="{{ path('app_category_new') }}" class="btn-create">
+            <i class="bi bi-plus-circle"></i> Ajouter une catégorie
+        </a>
+    </div>
+</div>
+{% endblock %}

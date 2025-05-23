@@ -1,0 +1,229 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AllController!{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://www.en-vols.com/wp-content/uploads/afmm/2022/02/livres-ouverts_shutterstock_1840804387.jpg') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .overlay-content {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-top: 50px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+
+<div class="container overlay-content">
+ <section class="hero py-5" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8 text-white"> 
+                <h1 class="display-4 fw-bold mb-3">Découvrez Votre Prochain Livre Préféré</h1>
+                <p class="lead mb-4">Parcourez notre vaste collection de livres dans tous les genres. Empruntez, lisez et explorez de nouveaux mondes.</p>
+                <div class="search-bar d-flex justify-content-center">
+                    <form method="get" action="{{ path('app_all') }}" class="w-75">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                placeholder="Rechercher un livre"
+                                name="search"
+                                id="bookSearch"
+                                value="{{ app.request.query.get('search') }}"
+                                autocomplete="off"
+                            >
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search me-2"></i>Rechercher
+                            </button>
+                        </div>
+                        <div id="suggestionsContainer" class="list-group mt-2" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="container my-4">
+    <form method="get" action="{{ path('app_all') }}">
+        <div class="row">
+            <div class="col-mf-8">
+                <select name="category_filter" class="form-select" onchange="this.form.submit()">
+                    <option value="{{ 0 }}">Toutes les catégories</option>
+                        {% if categories is not empty %}
+                            {% for category in categories %}
+                                <option value="category_{{ category.id }}" {{ app.request.query.get('category_filter') == 'category_' ~ category.id ? 'selected' }}>
+                                    {{ category.name }}
+                                </option>
+                                {% for subCategory in category.subCategories %}
+                                    <option value="subcategory_{{ subCategory.id }}" {{ app.request.query.get('category_filter') == 'subcategory_' ~ subCategory.id ? 'selected' }}>
+                                        *{{ category.name }} - {{ subCategory.name }}
+                                    </option>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                </select>
+            </div>
+    </form>
+</div>
+        <div class="container my-5">
+        
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ type }} alert-dismissible fade show auto-dismiss" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const alerts = document.querySelectorAll('.alert.auto-dismiss');
+        alerts.forEach(function (alert) {
+            setTimeout(function () {
+                alert.classList.remove('show'); // triggers fade out
+                alert.classList.add('fade');    // ensure fade class is applied
+            }, 3000); // wait 3 seconds before starting fade
+
+            setTimeout(function () {
+                alert.remove(); // remove from DOM after fade completes
+            }, 3500); // 500ms after fade starts (Bootstrap default transition duration is ~300ms)
+        });
+    });
+</script>
+
+
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for livre in livres %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                <div class="overflow-hidden" style="height: 300px;">
+                    <img src="{{ livre.image }}" class="card-img-top h-100 w-100 object-fit-cover" alt="Book Cover">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ livre.titre }}</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <p class="card-text text-muted">{{ livre.editeur }}</p>
+                    {% if (livre.datedispo == null or livre.datedispo != null) and livre.qtedispo > 0 %}
+                        <span class="badge bg-success">{{ livre.qtedispo }} Disponible </span>
+                    {% elseif livre.datedispo == null and livre.qtedispo < 1 %}
+                        <span class="badge bg-danger">Indisponible </span>
+                    {% else %}
+                        <span class="badge bg-danger">Indisponible jusqu'à {{livre.datedispo|date('d/m/Y')}}</span>
+                    {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-primary">Date d'edition:{{ livre.getDateEdition()|date('d/m/Y') }}</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 d-grid gap-2">
+                    <a class="btn btn-secondary" href={{path('app_livre_detail', {'id': livre.id})}}>Voir détail</a>
+                    <a class="btn btn-outline-primary" href={{path('app_calendar', {'id': livre.id})}}>Emprunter</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+    <div class="navigation">
+        {{ knp_pagination_render(livres, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('bookSearch');
+    const suggestionsContainer = document.getElementById('suggestionsContainer');
+    let debounceTimer;
+    
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(debounceTimer);
+        const searchTerm = e.target.value.trim();
+        
+        if (searchTerm.length < 1) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+        
+        // Show loading state
+        suggestionsContainer.innerHTML = `
+            <div class="list-group-item">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span class="ms-2">Searching...</span>
+            </div>
+        `;
+        suggestionsContainer.style.display = 'block';
+        
+        debounceTimer = setTimeout(() => {
+            fetch(`{{ path('app_all') }}?search=${encodeURIComponent(searchTerm)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || response.statusText);
+                }
+                return response.json();
+            })
+            .then(suggestions => {
+                suggestionsContainer.innerHTML = '';
+                
+                if (suggestions && suggestions.length > 0) {
+                    suggestions.forEach(book => {
+                        const suggestionItem = document.createElement('button');
+                        suggestionItem.type = 'button';
+                        suggestionItem.className = 'list-group-item list-group-item-action';
+                        suggestionItem.addEventListener('click', () => {
+                            // Update the search input with the book title
+                            searchInput.value = book.titre;
+                            // Submit the form
+                            searchInput.closest('form').submit();
+                        });
+                        suggestionItem.innerHTML = `
+                            <strong>${book.titre}</strong><br>
+                            <small class="text-muted">${book.editeur || 'Unknown'}</small>
+                        `;
+                        suggestionsContainer.appendChild(suggestionItem);
+                    });
+                } else {
+                    suggestionsContainer.innerHTML = `
+                        <div class="list-group-item text-muted">
+                            No books found matching "${searchTerm}"
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                suggestionsContainer.innerHTML = `
+                    <div class="list-group-item text-danger">
+                        Error: ${error.message}
+                    </div>
+                `;
+            });
+        }, 300);
+    });
+    
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

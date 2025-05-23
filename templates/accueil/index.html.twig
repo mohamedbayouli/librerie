@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue à la Bibliothèque{% endblock %}
+
+{% block body %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">Bienvenue sur votre Bibliothèque en ligne 📚</h1>
+            <p class="lead text-muted">Explorez un vaste catalogue de livres, découvrez nos nouveautés et empruntez en quelques clics.</p>
+            <a href="{{ path('app_all') }}" class="btn btn-success btn-lg mt-3">
+                <i class="fas fa-book-open me-2"></i>Voir les livres disponibles
+            </a>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Explorer</h5>
+                        <p class="card-text">Parcourez notre catalogue riche et varié de livres et trouvez votre prochaine lecture.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Nouveautés</h5>
+                        <p class="card-text">Découvrez les derniers ajouts et les recommandations spéciales sélectionnées pour vous.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <i class="fas fa-user fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Espace Membre</h5>
+                        <p class="card-text">Connectez-vous pour gérer vos emprunts, réserver des livres et suivre votre historique.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

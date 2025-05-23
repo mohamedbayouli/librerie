@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Sous-Catégories{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://img.freepik.com/photos-gratuite/vue-dessus-livres-espace-copie_23-2148827187.jpg?ga=GA1.1.658740073.1733163417&semt=ais_hybrid&w=740');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #004d40;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .card-custom {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        padding: 30px;
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+    thead tr {
+        background: linear-gradient(45deg, #00796b, #004d40);
+        color: white;
+        text-align: left;
+        border-radius: 15px;
+    }
+    thead th {
+        padding: 12px 15px;
+    }
+    tbody tr {
+        background: #f9f9f9;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        border-radius: 12px;
+    }
+    tbody td {
+        padding: 12px 15px;
+        vertical-align: middle;
+    }
+    .actions-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    a.btn-custom {
+        border-radius: 30px;
+        font-weight: 500;
+        padding: 6px 15px;
+        text-decoration: none;
+        color: white;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+    a.btn-show {
+        background: linear-gradient(45deg, #29b6f6, #0288d1);
+    }
+    a.btn-edit {
+        background: linear-gradient(45deg, #ffb74d, #f57c00);
+    }
+    .btn-inline-form form {
+        display: inline-block;
+        margin: 0;
+    }
+    .btn-inline-form form button {
+        border: none;
+        background: linear-gradient(45deg, #e57373, #d32f2f);
+        color: white;
+        border-radius: 30px;
+        padding: 6px 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: filter 0.3s ease;
+    }
+    .btn-inline-form form button:hover,
+    a.btn-create:hover,
+    a.btn-show:hover,
+    a.btn-edit:hover {
+        filter: brightness(1.1);
+    }
+    a.btn-create {
+        display: inline-block;
+        margin-top: 20px;
+        background: linear-gradient(45deg, #4caf50, #388e3c);
+        color: white;
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 5px 15px rgba(72,187,120,0.4);
+        transition: background-color 0.3s ease;
+    }
+</style>
+
+<div class="container">
+    <div class="card card-custom">
+        <h1>📚 Liste des Sous-Catégories</h1>
+
+        {% if sub_categories|length > 0 %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Catégorie</th>
+                        <th>Nom</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub_category in sub_categories %}
+                        <tr>
+                            <td>{{ sub_category.id }}</td>
+                            <td>{{ sub_category.category.name }}</td>
+                            <td>{{ sub_category.name }}</td>
+                            <td class="actions-cell">
+                                <a href="{{ path('app_sub_category_show', {'id': sub_category.id}) }}" class="btn-custom btn-show">Voir</a>
+                                <a href="{{ path('app_sub_category_edit', {'id': sub_category.id}) }}" class="btn-custom btn-edit">Modifier</a>
+                                <div class="btn-inline-form">
+                                    {{ include('sub_category/_delete_form.html.twig', {'sub_category': sub_category}) }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-warning text-center">
+                😕 Aucune sous-catégorie trouvée.
+            </div>
+        {% endif %}
+
+        <a href="{{ path('app_sub_category_new') }}" class="btn-create">
+            <i class="bi bi-plus-circle"></i> Créer une nouvelle sous-catégorie
+        </a>
+    </div>
+</div>
+{% endblock %}

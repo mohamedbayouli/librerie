@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil Admin - Bibliothèque{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://www.en-vols.com/wp-content/uploads/afmm/2022/02/livres-ouverts_shutterstock_1840804387.jpg') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .overlay-content {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-top: 50px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card {
+        background: linear-gradient(45deg, #4caf50, #2e7d32);
+        color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .stat-card:hover {
+        transform: scale(1.02);
+    }
+
+    .quick-actions .btn {
+        min-width: 180px;
+        font-weight: 600;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2e7d32;
+        margin: 2rem 0 1rem;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .action-buttons a {
+        margin-right: 8px;
+    }
+
+    .citation {
+        font-style: italic;
+        color: #555;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+</style>
+
+<section class="py-5">
+    <div class="container overlay-content">
+        <h1 class="display-5 fw-bold text-center text-success mb-4">📚 Tableau de bord Administrateur</h1>
+
+        <p class="citation">"Un lecteur vit mille vies avant de mourir. Celui qui ne lit jamais n’en vit qu’une." – George R.R. Martin</p>
+
+        {# Actions rapides #}
+        <div class="d-flex justify-content-center gap-4 quick-actions mb-5">
+            <a href="{{ path('app_livre_new') }}" class="btn btn-success">
+                <i class="fas fa-plus-circle me-2"></i> Nouveau Livre
+            </a>
+            
+        </div>
+
+        {# Derniers livres ajoutés #}
+        <h2 class="section-title text-center">📖 Derniers livres ajoutés</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for livre in livres %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="{{ livre.image }}" class="card-img-top" alt="{{ livre.titre }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ livre.titre }}</h5>
+                            <p class="card-text text-muted">
+                                {{ livre.resume|length > 80 ? livre.resume|slice(0, 80) ~ '...' : livre.resume }}
+                            </p>
+                            <span class="badge bg-secondary">{{ livre.catId ? livre.catId.name : '—' }}</span>
+                            <span class="badge bg-info text-dark">{{ livre.subCategory ? livre.subCategory.name : '—' }}</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="action-buttons">
+                                <a href="{{ path('app_livre_show', {'id': livre.id}) }}" class="btn btn-sm btn-outline-secondary" title="Voir"><i class="fas fa-eye"></i></a>
+                                <a href="{{ path('app_livre_edit', {'id': livre.id}) }}" class="btn btn-sm btn-outline-primary" title="Éditer"><i class="fas fa-edit"></i></a>
+                                <form method="post" action="{{ path('app_livre_delete', {'id': livre.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ livre.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                                </form>
+                            </div>
+                            <span class="badge {{ livre.dateDispo is empty ? 'bg-success' : 'bg-danger' }}">
+                                {{ livre.dateDispo is empty ? 'Disponible' : 'Indisponible' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 text-center text-muted">Aucun livre trouvé.</div>
+            {% endfor %}
+        </div>
+        <div class="navigation">
+{{ knp_pagination_render(livres, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}</div>
+
+        {# Statistiques principales en bas de page #}
+        <div class="row text-center mt-5">
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon mb-2"><i class="fas fa-book"></i></div>
+                    <h4>Total Livres</h4>
+                    <h2>{{ count|length }}</h2>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon mb-2"><i class="fas fa-check-circle"></i></div>
+                    <h4>Disponibles</h4>
+                    <h2>{{ Disponible|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
